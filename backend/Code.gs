@@ -1,4 +1,4 @@
-const SPREADSHEET_ID = '請貼上你的 Google 試算表 ID';
+const SPREADSHEET_ID = '17_HK3OGjiSa5UvjkzK96VPpIQM5c65yqOUPGGF1lKks';
 const SHEET_NAME = 'planets';
 
 function doGet(e) {
