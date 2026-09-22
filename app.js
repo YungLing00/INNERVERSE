@@ -68,8 +68,12 @@ function renderResult(){
 async function savePlanet(planet){
   const saved=JSON.parse(localStorage.getItem('innerversePlanets')||'[]'); saved.unshift(planet); localStorage.setItem('innerversePlanets',JSON.stringify(saved.slice(0,50)));
   if(!API_URL) return;
-  try{await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'create',...planet})});toast('你的星球已存入宇宙');}
-  catch(e){toast('目前使用本機模式，星球已保存在此裝置');}
+  try{
+    const response=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'create',...planet})});
+    const result=await response.json();
+    if(!response.ok||!result.success) throw new Error(result.message||'Save failed');
+    toast('你的星球已存入宇宙');
+  } catch(e){toast('目前使用本機模式，星球已保存在此裝置');}
 }
 async function loadUniverse(){
   const local=JSON.parse(localStorage.getItem('innerversePlanets')||'[]'); universeData=[...local,...DEMO];
