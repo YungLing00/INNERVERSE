@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbw9uKgLZhZgZgRU9vVJRDsouXrVHWb3H8ej-twpTccrHulbv6KtOto6SpzFWr5F7Qza/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyLxzC5iivkhOg8YbqqHXFfUppWk8gYSxN9k6eER-TyqvEpAh6DSQR1x1aeX0rFqa0h/exec";
 
 const QUESTIONS = [
   { trait:"O", text:"我喜歡接觸沒體驗過的新事物。", reverse:false },
