@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#050713" />
+    <meta name="description" content="INNERVERSE — 透過 10 道題，讓你的性格成為宇宙中的一顆星球。" />
+    <title>INNERVERSE — Discover Your Inner Planet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+
+    <header class="site-header">
+      <button class="brand" data-go="home" aria-label="回到首頁">
+        <span class="brand-mark"></span>
+        <span>INNERVERSE</span>
+      </button>
+      <nav aria-label="主要導覽">
+        <button class="nav-link" data-go="about">ABOUT</button>
+        <button class="nav-link" data-go="universe">UNIVERSE</button>
+      </nav>
+    </header>
+
+    <main>
+      <section id="home" class="screen active hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">10 QUESTIONS · 5 PLANETS · ONE UNIVERSE</p>
+          <h1 id="hero-title">Discover the<br /><span>universe within you.</span></h1>
+          <p class="hero-lead">每個人的內在，都有一顆獨一無二的星球。<br />回答 10 道題，找到你的星球，也找到與你同頻的人。</p>
+          <div class="hero-actions">
+            <button class="primary-btn" id="start-test">FIND MY PLANET <span>↗</span></button>
+            <button class="text-btn" data-go="universe">EXPLORE THE UNIVERSE <span>→</span></button>
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="orbit orbit-one"></div>
+          <div class="orbit orbit-two"></div>
+          <div class="planet hero-planet blue"><span></span></div>
+          <div class="moon moon-one"></div>
+          <div class="moon moon-two"></div>
+          <p class="planet-label">YOUR INNER<br />WORLD AWAITS</p>
+        </div>
+        <div class="scroll-note">SCROLL TO DISCOVER <span></span></div>
+      </section>
+
+      <section id="test" class="screen test-screen" aria-labelledby="question-title">
+        <div class="test-shell">
+          <button class="back-btn" id="test-back">← BACK</button>
+          <div class="test-meta">
+            <span>INNER PLANET TEST</span>
+            <span id="question-counter">01 / 10</span>
+          </div>
+          <div class="progress-track"><div id="progress-bar"></div></div>
+          <div class="question-wrap">
+            <p class="question-tag" id="question-tag">QUESTION 01</p>
+            <h2 id="question-title"></h2>
+            <p class="question-hint">選擇最接近你真實感受的答案。</p>
+            <div class="scale" id="answer-scale" role="radiogroup" aria-label="同意程度"></div>
+            <div class="scale-labels"><span>非常不同意</span><span>非常同意</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="forming" class="screen forming-screen" aria-live="polite">
+        <div class="forming-visual">
+          <div class="forming-ring ring-a"></div><div class="forming-ring ring-b"></div>
+          <div class="planet forming-planet"><span></span></div>
+        </div>
+        <p class="eyebrow">ANALYZING YOUR INNER WORLD</p>
+        <h2>Your planet is forming<span class="dots">...</span></h2>
+        <p>正在將你的性格特質轉化為星球。</p>
+      </section>
+
+      <section id="result" class="screen result-screen" aria-labelledby="result-name">
+        <div class="result-grid">
+          <div class="result-visual">
+            <div class="result-orbit"></div>
+            <div class="planet result-planet" id="result-planet"><span></span></div>
+            <span class="coordinate" id="planet-id">PLANET #000000</span>
+          </div>
+          <div class="result-copy">
+            <p class="eyebrow">YOUR INNER PLANET</p>
+            <p class="result-code" id="result-code">TYPE O</p>
+            <h2 id="result-name">EXPLORER</h2>
+            <p class="result-subtitle" id="result-subtitle">The Blue Planet</p>
+            <p class="result-description" id="result-description"></p>
+            <div class="score-list" id="score-list"></div>
+            <div class="result-actions">
+              <button class="primary-btn" id="enter-universe">ENTER THE UNIVERSE <span>→</span></button>
+              <button class="icon-btn" id="restart-test" title="重新測驗">↻</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="universe" class="screen universe-screen" aria-labelledby="universe-title">
+        <div class="universe-heading">
+          <div><p class="eyebrow">A UNIVERSE MADE OF PERSONALITIES</p><h2 id="universe-title">THE INNERVERSE</h2></div>
+          <div class="universe-count"><strong id="planet-count">0</strong><span>PLANETS<br />DISCOVERED</span></div>
+        </div>
+        <div class="filter-bar" id="filter-bar">
+          <button class="filter active" data-filter="ALL">ALL</button>
+          <button class="filter" data-filter="O"><i class="dot o"></i> EXPLORER</button>
+          <button class="filter" data-filter="C"><i class="dot c"></i> ARCHITECT</button>
+          <button class="filter" data-filter="E"><i class="dot e"></i> SPARK</button>
+          <button class="filter" data-filter="A"><i class="dot a"></i> HARMONIZER</button>
+          <button class="filter" data-filter="N"><i class="dot n"></i> SENSITIVE</button>
+        </div>
+        <div class="cosmos" id="cosmos" aria-label="人格星球宇宙"></div>
+        <div class="universe-tip">點擊任一顆星球，讓相同類型一起亮起來。</div>
+        <aside class="planet-card" id="planet-card" aria-live="polite">
+          <button id="close-card" aria-label="關閉">×</button>
+          <span class="card-type" id="card-type"></span>
+          <h3 id="card-name"></h3>
+          <p id="card-id"></p>
+          <div id="card-scores"></div>
+        </aside>
+      </section>
+
+      <section id="about" class="screen about-screen" aria-labelledby="about-title">
+        <p class="eyebrow">ABOUT THE PROJECT</p>
+        <h2 id="about-title">Personality becomes<br /><span>a shared universe.</span></h2>
+        <div class="about-grid">
+          <p>INNERVERSE 是一個受 Big Five 人格模型啟發的互動探索體驗。它不為你貼上標籤，而是把五個連續的人格維度轉譯成一顆專屬星球。</p>
+          <div class="about-stat"><strong>10</strong><span>QUESTIONS</span></div>
+          <div class="about-stat"><strong>5</strong><span>PLANET TYPES</span></div>
+          <div class="about-stat"><strong>1</strong><span>SHARED UNIVERSE</span></div>
+        </div>
+        <p class="disclaimer">此體驗用於互動設計與自我探索，並非臨床心理評估。</p>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
