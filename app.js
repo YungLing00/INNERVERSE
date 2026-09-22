@@ -1,4 +1,4 @@
-const API_URL = ""; // 部署 Google Apps Script 後，把 Web App URL 貼在這裡。
+const API_URL = "https://script.google.com/macros/s/AKfycbw9uKgLZhZgZgRU9vVJRDsouXrVHWb3H8ej-twpTccrHulbv6KtOto6SpzFWr5F7Qza/exec";
 
 const QUESTIONS = [
   { trait:"O", text:"我喜歡接觸沒體驗過的新事物。", reverse:false },
