@@ -50,3 +50,15 @@ const API_URL = "https://script.google.com/macros/s/你的部署ID/exec";
 後端未設定時，網站會使用 Local Storage 保存測驗結果，並載入示範星球。
 
 > 本作品用於互動設計與自我探索，並非臨床心理評估。
+
+## Tripo 3D API
+
+網站會把姓名、生日象徵關鍵字與 Big Five 結果轉成英文 Prompt，透過 Apps Script 安全呼叫 Tripo Text-to-Model API，輪詢生成進度後以 `<model-viewer>` 顯示 GLB。
+
+1. 在 Tripo Developer Platform 建立 API Key。
+2. 開啟 Apps Script 的「專案設定 → 指令碼屬性」。
+3. 新增屬性 `TRIPO_API_KEY`，值填入 Tripo API Key。
+4. 將最新版 `backend/Code.gs` 貼入 Apps Script。
+5. 重新部署「網頁應用程式」的新版本，存取權設為「所有人」。
+
+請勿把 Tripo API Key 放進 `app.js`、GitHub 或試算表。Tripo 的生成模型網址有效時間很短；正式長期保存需在下一階段串接 Supabase Storage、Cloudflare R2 或其他物件儲存服務。
