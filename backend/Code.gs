@@ -1,41 +1,15 @@
-const SPREADSHEET_ID = '17_HK3OGjiSa5UvjkzK96VPpIQM5c65yqOUPGGF1lKks';
-const SHEET_NAME = 'planets';
-
-function doGet(e) {
-  const action = (e.parameter.action || 'list').toLowerCase();
-  if (action !== 'list') return json({ success: false, message: 'Unknown action' });
-  const sheet = getSheet();
-  const rows = sheet.getDataRange().getValues();
-  if (rows.length < 2) return json({ success: true, data: [] });
-  const data = rows.slice(1).map(r => ({
-    id: String(r[0]), type: String(r[1]),
-    scores: { O:Number(r[2]), C:Number(r[3]), E:Number(r[4]), A:Number(r[5]), N:Number(r[6]) },
-    seed: Number(r[7]), createdAt: r[8]
-  }));
-  return json({ success: true, data: data });
-}
-
-function doPost(e) {
-  try {
-    const body = JSON.parse(e.postData.contents || '{}');
-    if (body.action !== 'create' || !/^[OCEAN]$/.test(body.type)) throw new Error('Invalid payload');
-    const s = body.scores || {};
-    getSheet().appendRow([body.id, body.type, s.O, s.C, s.E, s.A, s.N, body.seed, body.createdAt || new Date().toISOString()]);
-    return json({ success: true, id: body.id });
-  } catch (err) { return json({ success: false, message: err.message }); }
-}
-
-function getSheet() {
-  const book = SpreadsheetApp.openById(SPREADSHEET_ID);
-  let sheet = book.getSheetByName(SHEET_NAME);
-  if (!sheet) {
-    sheet = book.insertSheet(SHEET_NAME);
-    sheet.appendRow(['id','type','O','C','E','A','N','seed','created_at']);
-    sheet.setFrozenRows(1);
-  }
-  return sheet;
-}
-
-function json(data) {
-  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
-}
+const SPREADSHEET_ID='17_HK3OGjiSa5UvjkzK96VPpIQM5c65yqOUPGGF1lKks';
+const SHEET_NAME='planets_v2';
+const TRIPO_BASE_URL='https://openapi.tripo3d.ai/v3';
+function doGet(e){try{const action=String(e.parameter.action||'list').toLowerCase();if(action==='list')return json({success:true,data:listPlanets()});if(action==='tripo_status')return getTripoStatus(e.parameter.taskId);return json({success:false,message:'Unknown action'})}catch(err){return json({success:false,message:err.message})}}
+function doPost(e){try{const body=JSON.parse(e.postData.contents||'{}');if(body.action==='tripo_create')return createTripoTask(body.prompt);if(body.action==='create')return savePlanet(body);return json({success:false,message:'Unknown action'})}catch(err){return json({success:false,message:err.message})}}
+function createTripoTask(prompt){if(!prompt||prompt.length<20)throw new Error('Planet prompt is missing');const result=callTripo('/generation/text-to-model','post',{prompt:String(prompt).slice(0,1000),model:'v3.1-20260211'});if(!result.data||!result.data.task_id)throw new Error('Tripo did not return a task ID');return json({success:true,taskId:result.data.task_id})}
+function getTripoStatus(taskId){if(!taskId)throw new Error('Tripo task ID is missing');const result=callTripo('/tasks/'+encodeURIComponent(taskId),'get'),task=result.data||{},output=task.output||{};return json({success:true,taskId:task.task_id||taskId,status:task.status||'unknown',progress:Number(task.progress||0),modelUrl:output.model_url||'',thumbnailUrl:output.rendered_image_url||'',message:task.message||''})}
+function callTripo(path,method,payload){const apiKey=PropertiesService.getScriptProperties().getProperty('TRIPO_API_KEY');if(!apiKey)throw new Error('TRIPO_API_KEY 尚未設定');const options={method:method,headers:{Authorization:'Bearer '+apiKey},muteHttpExceptions:true};if(payload){options.contentType='application/json';options.payload=JSON.stringify(payload)}const response=UrlFetchApp.fetch(TRIPO_BASE_URL+path,options),status=response.getResponseCode(),text=response.getContentText();let data;try{data=JSON.parse(text)}catch(_){throw new Error('Tripo 回傳非 JSON 資料')}if(status<200||status>=300||data.code!==0)throw new Error((data&&(data.message||data.msg))||('Tripo API error '+status));return data}
+function savePlanet(body){if(!/^[OCEAN]$/.test(body.type))throw new Error('Invalid personality type');const s=body.scores||{};getSheet().appendRow([safe(body.id),safe(body.nickname),safe(body.type),safe(body.secondaryType),number(s.O),number(s.C),number(s.E),number(s.A),number(s.N),JSON.stringify(body.keywords||[]),number(body.birthdaySeed),number(body.seed),safe(body.status),safe(body.tripoTaskId),safe(body.modelUrl),safe(body.thumbnailUrl),safe(body.prompt),safe(body.createdAt||new Date().toISOString())]);return json({success:true,id:body.id})}
+function listPlanets(){const rows=getSheet().getDataRange().getValues();return rows.slice(1).filter(r=>r[0]).map(r=>({id:String(r[0]),nickname:String(r[1]),type:String(r[2]),secondaryType:String(r[3]),scores:{O:Number(r[4]),C:Number(r[5]),E:Number(r[6]),A:Number(r[7]),N:Number(r[8])},keywords:parseArray(r[9]),birthdaySeed:Number(r[10]),seed:Number(r[11]),status:String(r[12]),tripoTaskId:String(r[13]),modelUrl:String(r[14]),thumbnailUrl:String(r[15]),prompt:String(r[16]),createdAt:r[17]}))}
+function getSheet(){const book=SpreadsheetApp.openById(SPREADSHEET_ID);let sheet=book.getSheetByName(SHEET_NAME);if(!sheet){sheet=book.insertSheet(SHEET_NAME);sheet.appendRow(['id','nickname','type','secondary_type','O','C','E','A','N','keywords','birthday_seed','seed','status','tripo_task_id','model_url','thumbnail_url','prompt','created_at']);sheet.setFrozenRows(1)}return sheet}
+function parseArray(value){try{return JSON.parse(value||'[]')}catch(_){return[]}}
+function safe(value){return value==null?'':String(value).slice(0,5000)}
+function number(value){const n=Number(value);return isFinite(n)?n:0}
+function json(data){return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON)}
