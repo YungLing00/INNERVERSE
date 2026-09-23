@@ -106,6 +106,7 @@
             <div class="result-orbit"></div>
             <div class="planet result-planet" id="result-planet"><span></span></div>
             <model-viewer id="result-model" camera-controls auto-rotate shadow-intensity="1" environment-image="neutral" interaction-prompt="none" alt="AI 生成的專屬 3D 星球"></model-viewer>
+            <span class="model-status" id="result-model-status" role="status"></span>
             <span class="coordinate" id="planet-id">PLANET #000000</span>
           </div>
           <div class="result-copy">
@@ -141,6 +142,7 @@
         <div class="universe-tip">點擊任一顆星球，讓相同類型一起亮起來。</div>
         <aside class="planet-card" id="planet-card" aria-live="polite">
           <button id="close-card" aria-label="關閉">×</button>
+          <div class="card-model-wrap"><model-viewer id="card-model" camera-controls auto-rotate shadow-intensity="1" environment-image="neutral" interaction-prompt="none" alt="宇宙裡的 3D 星球"></model-viewer><span id="card-model-status" role="status"></span></div>
           <span class="card-type" id="card-type"></span>
           <h3 id="card-name"></h3>
           <p id="card-id"></p>
