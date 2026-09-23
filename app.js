@@ -1,106 +1,30 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbyLxzC5iivkhOg8YbqqHXFfUppWk8gYSxN9k6eER-TyqvEpAh6DSQR1x1aeX0rFqa0h/exec";
-
-const QUESTIONS = [
-  { trait:"O", text:"我喜歡接觸沒體驗過的新事物。", reverse:false },
-  { trait:"O", text:"比起嘗試新的方法，我通常更喜歡熟悉的做法。", reverse:true },
-  { trait:"C", text:"開始做事情前，我通常會先安排好步驟。", reverse:false },
-  { trait:"C", text:"我常常做到一半，才開始想下一步要做什麼。", reverse:true },
-  { trait:"E", text:"和一群人在一起時，我通常會主動加入互動。", reverse:false },
-  { trait:"E", text:"在熱鬧的場合中，我通常比較喜歡待在旁邊。", reverse:true },
-  { trait:"A", text:"我很容易注意到別人的感受。", reverse:false },
-  { trait:"A", text:"意見不同時，我通常不太在意對方的感受。", reverse:true },
-  { trait:"N", text:"我的情緒很容易受到周遭事情影響。", reverse:false },
-  { trait:"N", text:"面對壓力或突發狀況時，我通常很快就能平靜下來。", reverse:true }
-];
-
-const TYPES = {
-  O:{name:"EXPLORER", subtitle:"The Blue Planet", color:"#4ba9ff", light:"#a9e4ff", dark:"#163a9e", description:"你以好奇心探索未知，喜歡新的想法與體驗。你的世界充滿想像，也總能從不同角度看見可能。"},
-  C:{name:"ARCHITECT", subtitle:"The Green Planet", color:"#60d394", light:"#c3ffe1", dark:"#166650", description:"你擅長建立秩序，將想法一步步變成現實。穩定、專注與責任感，是你的星球持續運轉的力量。"},
-  E:{name:"SPARK", subtitle:"The Yellow Planet", color:"#ffd15c", light:"#fff2b6", dark:"#9b5d12", description:"你從交流與行動中獲得能量，願意表達也樂於連結。你的存在像一道光，為周遭帶來活力。"},
-  A:{name:"HARMONIZER", subtitle:"The Pink Planet", color:"#ff80b7", light:"#ffd0e6", dark:"#8c2857", description:"你能感受他人的需要，重視理解、合作與溫柔。你讓不同的聲音找到平衡，也讓關係產生連結。"},
-  N:{name:"SENSITIVE", subtitle:"The Gray Planet", color:"#a9afc3", light:"#eff1fa", dark:"#555d78", description:"你對環境與情緒的變化格外敏銳。細膩的感受力，讓你看見容易被忽略的訊號與深層情感。"}
-};
-
-const DEMO = [
-  ["O",82,57,71,64,38],["A",56,61,44,88,52],["C",49,91,39,72,35],["E",66,52,93,70,41],["N",73,46,35,67,89],
-  ["O",94,68,55,48,43],["C",58,84,62,63,31],["A",47,72,53,92,58],["E",69,44,86,57,46],["O",87,51,76,70,62],
-  ["N",65,53,40,74,84],["A",77,69,58,86,39],["C",44,88,48,61,45],["E",61,55,90,68,34],["O",91,43,64,59,55],
-  ["A",52,74,45,89,47],["C",62,93,51,56,29],["N",72,59,37,71,91],["E",54,47,88,65,53],["O",85,64,69,73,42]
-].map((d,i)=>({id:`DEMO${String(i+1).padStart(3,"0")}`,type:d[0],scores:{O:d[1],C:d[2],E:d[3],A:d[4],N:d[5]},seed:1100+i*97}));
-
-let currentQuestion=0, answers=[], currentResult=null, universeData=[];
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-
-function showScreen(id){ $$(".screen").forEach(s=>s.classList.toggle("active",s.id===id)); window.scrollTo(0,0); if(id==="universe") loadUniverse(); }
-$$('[data-go]').forEach(b=>b.addEventListener('click',()=>showScreen(b.dataset.go)));
-$('#start-test').addEventListener('click',startTest); $('#restart-test').addEventListener('click',startTest); $('#enter-universe').addEventListener('click',()=>showScreen('universe'));
-
-function startTest(){ currentQuestion=0; answers=[]; showScreen('test'); renderQuestion(); }
-function renderQuestion(){
-  const q=QUESTIONS[currentQuestion];
-  $('#question-counter').textContent=`${String(currentQuestion+1).padStart(2,'0')} / 10`;
-  $('#question-tag').textContent=`QUESTION ${String(currentQuestion+1).padStart(2,'0')}`;
-  $('#question-title').textContent=q.text; $('#progress-bar').style.width=`${(currentQuestion+1)*10}%`;
-  const scale=$('#answer-scale'); scale.innerHTML='';
-  for(let v=1;v<=5;v++){ const b=document.createElement('button'); b.className='answer'; b.dataset.value=v; b.setAttribute('role','radio'); b.setAttribute('aria-label',`${v} 分`); b.addEventListener('click',()=>selectAnswer(v)); scale.appendChild(b); }
-}
-function selectAnswer(value){ answers[currentQuestion]=value; if(currentQuestion<9){ currentQuestion++; setTimeout(renderQuestion,180); }else finishTest(); }
-$('#test-back').addEventListener('click',()=>{ if(currentQuestion===0) showScreen('home'); else{currentQuestion--;renderQuestion();} });
-
-function finishTest(){
-  const raw={O:0,C:0,E:0,A:0,N:0};
-  QUESTIONS.forEach((q,i)=>raw[q.trait]+=q.reverse?6-answers[i]:answers[i]);
-  const scores=Object.fromEntries(Object.entries(raw).map(([k,v])=>[k,Math.round((v-2)/8*100)]));
-  const max=Math.max(...Object.values(scores)); const type=Object.keys(scores).find(k=>scores[k]===max);
-  currentResult={id:createId(),type,scores,seed:Math.floor(Math.random()*900000)+100000,createdAt:new Date().toISOString()};
-  showScreen('forming'); setTimeout(()=>{renderResult();showScreen('result');savePlanet(currentResult)},1800);
-}
+const API_URL="https://script.google.com/macros/s/AKfycbyLxzC5iivkhOg8YbqqHXFfUppWk8gYSxN9k6eER-TyqvEpAh6DSQR1x1aeX0rFqa0h/exec";
+const QUESTIONS=[{trait:"O",text:"我喜歡接觸沒體驗過的新事物。",reverse:false},{trait:"O",text:"比起嘗試新的方法，我通常更喜歡熟悉的做法。",reverse:true},{trait:"C",text:"開始做事情前，我通常會先安排好步驟。",reverse:false},{trait:"C",text:"我常常做到一半，才開始想下一步要做什麼。",reverse:true},{trait:"E",text:"和一群人在一起時，我通常會主動加入互動。",reverse:false},{trait:"E",text:"在熱鬧的場合中，我通常比較喜歡待在旁邊。",reverse:true},{trait:"A",text:"我很容易注意到別人的感受。",reverse:false},{trait:"A",text:"意見不同時，我通常不太在意對方的感受。",reverse:true},{trait:"N",text:"我的情緒很容易受到周遭事情影響。",reverse:false},{trait:"N",text:"面對壓力或突發狀況時，我通常很快就能平靜下來。",reverse:true}];
+const TYPES={O:{name:"EXPLORER",subtitle:"The Blue Planet",color:"#4ba9ff",light:"#a9e4ff",dark:"#163a9e",word:"curious",description:"你以好奇心探索未知，喜歡新的想法與體驗。你的世界充滿想像，也總能從不同角度看見可能。"},C:{name:"ARCHITECT",subtitle:"The Green Planet",color:"#60d394",light:"#c3ffe1",dark:"#166650",word:"structured",description:"你擅長建立秩序，將想法一步步變成現實。穩定、專注與責任感，是你的星球持續運轉的力量。"},E:{name:"SPARK",subtitle:"The Yellow Planet",color:"#ffd15c",light:"#fff2b6",dark:"#9b5d12",word:"radiant",description:"你從交流與行動中獲得能量，願意表達也樂於連結。你的存在像一道光，為周遭帶來活力。"},A:{name:"HARMONIZER",subtitle:"The Pink Planet",color:"#ff80b7",light:"#ffd0e6",dark:"#8c2857",word:"harmonious",description:"你能感受他人的需要，重視理解、合作與溫柔。你讓不同的聲音找到平衡，也讓關係產生連結。"},N:{name:"SENSITIVE",subtitle:"The Gray Planet",color:"#a9afc3",light:"#eff1fa",dark:"#555d78",word:"sensitive",description:"你對環境與情緒的變化格外敏銳。細膩的感受力，讓你看見容易被忽略的訊號與深層情感。"}};
+const DEMO=[["O",82,57,71,64,38],["A",56,61,44,88,52],["C",49,91,39,72,35],["E",66,52,93,70,41],["N",73,46,35,67,89],["O",94,68,55,48,43],["C",58,84,62,63,31],["A",47,72,53,92,58],["E",69,44,86,57,46],["O",87,51,76,70,62],["N",65,53,40,74,84],["A",77,69,58,86,39]].map((d,i)=>({id:`DEMO${String(i+1).padStart(3,"0")}`,nickname:"Traveler",type:d[0],scores:{O:d[1],C:d[2],E:d[3],A:d[4],N:d[5]},seed:1100+i*97}));
+let currentQuestion=0,answers=[],currentResult=null,profileData=null,universeData=[];
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function showScreen(id){$$('.screen').forEach(s=>s.classList.toggle('active',s.id===id));window.scrollTo(0,0);if(id==='universe')loadUniverse()}
+$$('[data-go]').forEach(b=>b.addEventListener('click',()=>showScreen(b.dataset.go)));$('#start-test').addEventListener('click',()=>showScreen('profile'));$('#restart-test').addEventListener('click',()=>showScreen('profile'));$('#enter-universe').addEventListener('click',()=>showScreen('universe'));
+$('#profile-form').addEventListener('submit',e=>{e.preventDefault();profileData={nickname:$('#nickname').value.trim(),birthday:$('#birthday').value};startTest()});
+function startTest(){currentQuestion=0;answers=[];showScreen('test');renderQuestion()}
+function renderQuestion(){const q=QUESTIONS[currentQuestion];$('#question-counter').textContent=`${String(currentQuestion+1).padStart(2,'0')} / 10`;$('#question-tag').textContent=`QUESTION ${String(currentQuestion+1).padStart(2,'0')}`;$('#question-title').textContent=q.text;$('#progress-bar').style.width=`${(currentQuestion+1)*10}%`;const scale=$('#answer-scale');scale.innerHTML='';for(let v=1;v<=5;v++){const b=document.createElement('button');b.className='answer';b.dataset.value=v;b.setAttribute('role','radio');b.setAttribute('aria-label',`${v} 分`);b.addEventListener('click',()=>selectAnswer(v));scale.appendChild(b)}}
+function selectAnswer(v){answers[currentQuestion]=v;if(currentQuestion<9){currentQuestion++;setTimeout(renderQuestion,180)}else finishTest()}
+$('#test-back').addEventListener('click',()=>{if(currentQuestion===0)showScreen('profile');else{currentQuestion--;renderQuestion()}});
+async function finishTest(){const raw={O:0,C:0,E:0,A:0,N:0};QUESTIONS.forEach((q,i)=>raw[q.trait]+=q.reverse?6-answers[i]:answers[i]);const scores=Object.fromEntries(Object.entries(raw).map(([k,v])=>[k,Math.round((v-2)/8*100)])),ranked=Object.entries(scores).sort((a,b)=>b[1]-a[1]),type=ranked[0][0],secondaryType=ranked[1][0],seed=birthdaySeed(profileData.birthday),keywords=birthKeywords(profileData.birthday,type);currentResult={id:createId(),nickname:profileData.nickname,birthdaySeed:seed,type,secondaryType,scores,keywords,seed,createdAt:new Date().toISOString(),status:'generating'};currentResult.prompt=buildTripoPrompt(currentResult);showScreen('forming');setGenerationProgress(4,'PREPARING YOUR PLANET','正在整理人格與生日象徵。');try{const created=await apiPost({action:'tripo_create',prompt:currentResult.prompt});currentResult.tripoTaskId=created.taskId;await pollTripoTask(created.taskId)}catch(error){console.warn(error);currentResult.status='fallback';toast('Tripo 尚未連線，先顯示程序化星球')}renderResult();showScreen('result');await savePlanet(currentResult)}
+function birthdaySeed(date){return Number(date.replaceAll('-','').slice(2))||Math.floor(Math.random()*900000)+100000}
+function birthKeywords(date,type){const [,m,d]=date.split('-').map(Number),md=m*100+d,signs=[[120,'disciplined'],[219,'visionary'],[321,'dreamy'],[420,'bold'],[521,'grounded'],[621,'adaptive'],[723,'nurturing'],[823,'radiant'],[923,'refined'],[1023,'balanced'],[1122,'mysterious'],[1222,'adventurous'],[1232,'disciplined']],sign=signs.find(([limit])=>md<limit)||signs[0];let sum=date.replaceAll('-','').split('').reduce((a,n)=>a+Number(n),0);while(sum>9)sum=String(sum).split('').reduce((a,n)=>a+Number(n),0);const nums={1:'independent',2:'harmonious',3:'expressive',4:'stable',5:'free',6:'caring',7:'introspective',8:'powerful',9:'compassionate'};return[TYPES[type].word,sign[1],nums[sum]]}
+function buildTripoPrompt(p){const main=TYPES[p.type],second=TYPES[p.secondaryType],s=p.scores,ocean=s.O>60?'deep luminous oceans and imaginative organic islands':'calm enclosed seas and clean coastlines',terrain=s.C>60?'carefully structured mountain ranges and ordered surface patterns':'free-flowing natural terrain',energy=s.E>60?'a bright radiant core and glowing crystal formations':'a quiet soft inner glow',nature=s.A>60?'gentle vegetation and harmonious atmospheric details':'minimal resilient vegetation',weather=s.N>60?'dramatic cloud formations and emotional surface variation':'clear atmosphere and peaceful weather';return`A complete spherical fantasy planet as one isolated 3D object. ${main.name} personality blended with ${second.name}. Keywords: ${p.keywords.join(', ')}. ${ocean}, ${terrain}, ${energy}, ${nature}, ${weather}. Main color ${main.color}, secondary color ${second.color}, silver-white accents. Elegant stylized high-quality game-ready 3D asset, detailed PBR surface, clean topology, centered, fully visible round planet, no background, no text, no stand, no characters, no spaceship, no extra planets.`}
+async function apiPost(body){const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}),json=await res.json();if(!res.ok||!json.success)throw new Error(json.message||'API request failed');return json}
+async function pollTripoTask(taskId){for(let attempt=0;attempt<45;attempt++){await sleep(attempt===0?1800:3000);const res=await fetch(`${API_URL}?action=tripo_status&taskId=${encodeURIComponent(taskId)}`),json=await res.json();if(!json.success)throw new Error(json.message||'Unable to read Tripo status');const progress=Math.max(8,Math.min(99,Number(json.progress)||attempt*2+8));setGenerationProgress(progress,'TRIPO IS BUILDING YOUR WORLD',generationMessage(progress));if(json.status==='success'){currentResult.status='ready';currentResult.modelUrl=json.modelUrl;currentResult.thumbnailUrl=json.thumbnailUrl||'';setGenerationProgress(100,'YOUR PLANET IS READY','正在將星球送入共享宇宙。');await sleep(800);return}if(['failed','cancelled','banned'].includes(json.status))throw new Error(`Tripo task ${json.status}`)}throw new Error('Tripo generation timed out')}
+function generationMessage(p){if(p<25)return'正在建立星球輪廓與地形。';if(p<55)return'正在生成海洋、生態與山脈。';if(p<85)return'正在加入材質、色彩與光澤。';return'正在完成專屬 3D 星球。'}
+function setGenerationProgress(p,stage,message){$('#generation-bar').style.width=`${p}%`;$('#generation-number').textContent=`${Math.round(p)}%`;$('#forming-stage').textContent=stage;$('#forming-message').textContent=message}
 function createId(){return Math.random().toString(36).slice(2,8).toUpperCase()}
-function renderResult(){
-  const t=TYPES[currentResult.type], root=document.documentElement;
-  root.style.setProperty('--type-color',t.color); root.style.setProperty('--planet-glow',t.color+'88');
-  $('#result-code').textContent=`TYPE ${currentResult.type}`; $('#result-name').textContent=t.name; $('#result-subtitle').textContent=t.subtitle;
-  $('#result-description').textContent=t.description; $('#planet-id').textContent=`PLANET #${currentResult.id}`;
-  $('#result-planet').style.background=`radial-gradient(circle at 36% 32%,${t.light},${t.color} 30%,${t.dark} 66%,#07091b 100%)`;
-  $('#score-list').innerHTML=Object.entries(currentResult.scores).map(([k,v])=>`<div class="score-row"><label>${k}</label><div class="score-bar"><i style="--bar:${TYPES[k].color};width:${v}%"></i></div><span>${v}</span></div>`).join('');
-}
-
-async function savePlanet(planet){
-  const saved=JSON.parse(localStorage.getItem('innerversePlanets')||'[]'); saved.unshift(planet); localStorage.setItem('innerversePlanets',JSON.stringify(saved.slice(0,50)));
-  if(!API_URL) return;
-  try{
-    const response=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'create',...planet})});
-    const result=await response.json();
-    if(!response.ok||!result.success) throw new Error(result.message||'Save failed');
-    toast('你的星球已存入宇宙');
-  } catch(e){toast('目前使用本機模式，星球已保存在此裝置');}
-}
-async function loadUniverse(){
-  const local=JSON.parse(localStorage.getItem('innerversePlanets')||'[]'); universeData=[...local,...DEMO];
-  if(API_URL){try{const res=await fetch(`${API_URL}?action=list`);const json=await res.json();if(json.success&&json.data.length) universeData=[...json.data,...DEMO.slice(0,8)];}catch(e){toast('無法連線資料庫，已顯示本機宇宙');}}
-  renderUniverse(universeData); resetFilter();
-}
-function renderUniverse(data){
-  $('#planet-count').textContent=data.length; const cosmos=$('#cosmos'); cosmos.innerHTML='';
-  data.forEach((p,i)=>{
-    const t=TYPES[p.type]||TYPES.O, rng=mulberry32(Number(p.seed)||i+8), size=Math.round(28+rng()*48), btn=document.createElement('button');
-    btn.className='cosmos-planet'; btn.dataset.type=p.type; btn.style.cssText=`--size:${size}px;--color:${t.color};--light:${t.light};--dark:${t.dark};--glow:${t.color}66;--speed:${4+rng()*4}s;--delay:${-rng()*5}s;--rotate:${rng()*160}deg;width:${size}px;height:${size}px;left:${4+rng()*88}%;top:${5+rng()*82}%`;
-    btn.setAttribute('aria-label',`${t.name} 星球 ${p.id}`); btn.addEventListener('click',()=>selectPlanet(p,btn)); cosmos.appendChild(btn);
-  });
-}
-function selectPlanet(p,el){
-  $$('.cosmos-planet').forEach(x=>{x.classList.toggle('dimmed',x.dataset.type!==p.type);x.classList.toggle('highlight',x.dataset.type===p.type)});
-  $$('.filter').forEach(x=>x.classList.toggle('active',x.dataset.filter===p.type));
-  const t=TYPES[p.type]; $('#planet-card').classList.add('open'); $('#planet-card').style.setProperty('--card-color',t.color); $('#card-type').textContent=`TYPE ${p.type} · ${t.subtitle}`; $('#card-name').textContent=t.name; $('#card-id').textContent=`PLANET #${p.id}`;
-  $('#card-scores').innerHTML=Object.entries(p.scores).map(([k,v])=>`<div class="card-score"><span>${k}</span><span>${v}</span></div>`).join('');
-}
-$('#close-card').addEventListener('click',()=>{$('#planet-card').classList.remove('open');resetFilter()});
-$('#filter-bar').addEventListener('click',e=>{const b=e.target.closest('.filter');if(!b)return;const f=b.dataset.filter;$$('.filter').forEach(x=>x.classList.toggle('active',x===b));$$('.cosmos-planet').forEach(x=>{x.classList.toggle('dimmed',f!=='ALL'&&x.dataset.type!==f);x.classList.toggle('highlight',f!=='ALL'&&x.dataset.type===f)});$('#planet-card').classList.remove('open')});
-function resetFilter(){$$('.filter').forEach(x=>x.classList.toggle('active',x.dataset.filter==='ALL'));$$('.cosmos-planet').forEach(x=>x.classList.remove('dimmed','highlight'))}
-function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
-function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2600)}
-
-const canvas=$('#starfield'),ctx=canvas.getContext('2d');let stars=[];
-function resizeStars(){const d=Math.min(devicePixelRatio,2);canvas.width=innerWidth*d;canvas.height=innerHeight*d;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';ctx.setTransform(d,0,0,d,0,0);stars=Array.from({length:Math.round(innerWidth*innerHeight/8000)},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.25+.15,a:Math.random()*.7+.15,s:Math.random()*.006+.002}))}
-function drawStars(t=0){ctx.clearRect(0,0,innerWidth,innerHeight);for(const s of stars){ctx.globalAlpha=s.a*(.65+.35*Math.sin(t*s.s));ctx.fillStyle='#e9e8ff';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill()}requestAnimationFrame(drawStars)}
-addEventListener('resize',resizeStars);resizeStars();drawStars();addEventListener('scroll',()=>$('.site-header').classList.toggle('scrolled',scrollY>15));
+function renderResult(){const t=TYPES[currentResult.type],root=document.documentElement;root.style.setProperty('--type-color',t.color);root.style.setProperty('--planet-glow',t.color+'88');$('#result-code').textContent=`${currentResult.nickname} · TYPE ${currentResult.type}`;$('#result-name').textContent=t.name;$('#result-subtitle').textContent=t.subtitle;$('#result-description').textContent=t.description;$('#planet-id').textContent=`PLANET #${currentResult.id}`;$('#result-planet').style.background=`radial-gradient(circle at 36% 32%,${t.light},${t.color} 30%,${t.dark} 66%,#07091b 100%)`;$('#birth-keywords').innerHTML=currentResult.keywords.map(k=>`<span>${k.toUpperCase()}</span>`).join('');$('#score-list').innerHTML=Object.entries(currentResult.scores).map(([k,v])=>`<div class="score-row"><label>${k}</label><div class="score-bar"><i style="--bar:${TYPES[k].color};width:${v}%"></i></div><span>${v}</span></div>`).join('');const visual=$('.result-visual'),model=$('#result-model');visual.classList.toggle('has-model',Boolean(currentResult.modelUrl));if(currentResult.modelUrl)model.src=currentResult.modelUrl;else model.removeAttribute('src')}
+async function savePlanet(planet){const saved=JSON.parse(localStorage.getItem('innerversePlanets')||'[]');saved.unshift(planet);localStorage.setItem('innerversePlanets',JSON.stringify(saved.slice(0,50)));try{await apiPost({action:'create',...planet});toast('你的星球已存入宇宙')}catch(e){toast('星球已保存在此裝置，雲端儲存失敗')}}
+async function loadUniverse(){const local=JSON.parse(localStorage.getItem('innerversePlanets')||'[]');universeData=[...local,...DEMO];try{const res=await fetch(`${API_URL}?action=list`),json=await res.json();if(json.success&&json.data.length)universeData=[...json.data,...DEMO.slice(0,6)]}catch(e){toast('已顯示本機宇宙')}renderUniverse(universeData);resetFilter()}
+function renderUniverse(data){$('#planet-count').textContent=data.length;const cosmos=$('#cosmos');cosmos.innerHTML='';data.forEach((p,i)=>{const t=TYPES[p.type]||TYPES.O,rng=mulberry32(Number(p.seed)||i+8),size=Math.round(28+rng()*48),btn=document.createElement('button');btn.className='cosmos-planet';btn.dataset.type=p.type;btn.style.cssText=`--size:${size}px;--color:${t.color};--light:${t.light};--dark:${t.dark};--glow:${t.color}66;--speed:${4+rng()*4}s;--delay:${-rng()*5}s;--rotate:${rng()*160}deg;width:${size}px;height:${size}px;left:${4+rng()*88}%;top:${5+rng()*82}%`;btn.setAttribute('aria-label',`${t.name} 星球 ${p.id}`);btn.addEventListener('click',()=>selectPlanet(p));cosmos.appendChild(btn)})}
+function selectPlanet(p){$$('.cosmos-planet').forEach(x=>{x.classList.toggle('dimmed',x.dataset.type!==p.type);x.classList.toggle('highlight',x.dataset.type===p.type)});$$('.filter').forEach(x=>x.classList.toggle('active',x.dataset.filter===p.type));const t=TYPES[p.type];$('#planet-card').classList.add('open');$('#planet-card').style.setProperty('--card-color',t.color);$('#card-type').textContent=`TYPE ${p.type} · ${t.subtitle}`;$('#card-name').textContent=p.nickname||t.name;$('#card-id').textContent=`PLANET #${p.id}`;$('#card-scores').innerHTML=Object.entries(p.scores).map(([k,v])=>`<div class="card-score"><span>${k}</span><span>${v}</span></div>`).join('')}
+$('#close-card').addEventListener('click',()=>{$('#planet-card').classList.remove('open');resetFilter()});$('#filter-bar').addEventListener('click',e=>{const b=e.target.closest('.filter');if(!b)return;const f=b.dataset.filter;$$('.filter').forEach(x=>x.classList.toggle('active',x===b));$$('.cosmos-planet').forEach(x=>{x.classList.toggle('dimmed',f!=='ALL'&&x.dataset.type!==f);x.classList.toggle('highlight',f!=='ALL'&&x.dataset.type===f)});$('#planet-card').classList.remove('open')});
+function resetFilter(){$$('.filter').forEach(x=>x.classList.toggle('active',x.dataset.filter==='ALL'));$$('.cosmos-planet').forEach(x=>x.classList.remove('dimmed','highlight'))}function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000)}
+const canvas=$('#starfield'),ctx=canvas.getContext('2d');let stars=[];function resizeStars(){const d=Math.min(devicePixelRatio,2);canvas.width=innerWidth*d;canvas.height=innerHeight*d;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';ctx.setTransform(d,0,0,d,0,0);stars=Array.from({length:Math.round(innerWidth*innerHeight/8000)},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.25+.15,a:Math.random()*.7+.15,s:Math.random()*.006+.002}))}function drawStars(t=0){ctx.clearRect(0,0,innerWidth,innerHeight);for(const s of stars){ctx.globalAlpha=s.a*(.65+.35*Math.sin(t*s.s));ctx.fillStyle='#e9e8ff';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill()}requestAnimationFrame(drawStars)}addEventListener('resize',resizeStars);resizeStars();drawStars();addEventListener('scroll',()=>$('.site-header').classList.toggle('scrolled',scrollY>15));
