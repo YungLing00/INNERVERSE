@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260923-model" />
+    <link rel="stylesheet" href="styles.css?v=20260923-universe4" />
   </head>
   <body>
     <canvas id="starfield" aria-hidden="true"></canvas>
@@ -105,7 +105,8 @@
           <div class="result-visual">
             <div class="result-orbit"></div>
             <div class="planet result-planet" id="result-planet"><span></span></div>
-            <model-viewer id="result-model" camera-controls auto-rotate shadow-intensity="1" environment-image="neutral" interaction-prompt="none" alt="AI 生成的專屬 3D 星球"></model-viewer>
+            <img id="result-poster" class="planet-poster" alt="Tripo 生成星球的預覽畫面" />
+            <model-viewer id="result-model" loading="eager" camera-controls auto-rotate shadow-intensity="1" environment-image="neutral" interaction-prompt="none" alt="AI 生成的專屬 3D 星球"></model-viewer>
             <span class="model-status" id="result-model-status" role="status"></span>
             <span class="coordinate" id="planet-id">PLANET #000000</span>
           </div>
@@ -114,9 +115,11 @@
             <p class="result-code" id="result-code">TYPE O</p>
             <h2 id="result-name">EXPLORER</h2>
             <p class="result-subtitle" id="result-subtitle">The Blue Planet</p>
+            <h3 class="result-detail-heading">星球外觀</h3>
             <p class="result-description" id="result-description"></p>
             <div class="birth-keywords" id="birth-keywords"></div>
             <div class="score-list" id="score-list"></div>
+            <section class="personality-analysis" id="personality-analysis" aria-label="完整人格分析"></section>
             <div class="result-actions">
               <button class="primary-btn" id="enter-universe">ENTER THE UNIVERSE <span>→</span></button>
               <button class="icon-btn" id="restart-test" title="重新測驗">↻</button>
@@ -139,14 +142,16 @@
           <button class="filter" data-filter="N"><i class="dot n"></i> SENSITIVE</button>
         </div>
         <div class="cosmos" id="cosmos" aria-label="人格星球宇宙"></div>
-        <div class="universe-tip">點擊任一顆星球，讓相同類型一起亮起來。</div>
+        <div class="universe-tip">生成完成的星球會顯示 Tripo 模型；點擊可旋轉查看 3D。</div>
         <aside class="planet-card" id="planet-card" aria-live="polite">
           <button id="close-card" aria-label="關閉">×</button>
-          <div class="card-model-wrap"><model-viewer id="card-model" camera-controls auto-rotate shadow-intensity="1" environment-image="neutral" interaction-prompt="none" alt="宇宙裡的 3D 星球"></model-viewer><span id="card-model-status" role="status"></span></div>
+          <div class="card-model-wrap"><img id="card-poster" class="planet-poster" alt="星球預覽畫面" /><model-viewer id="card-model" loading="eager" camera-controls auto-rotate shadow-intensity="1" environment-image="neutral" interaction-prompt="none" alt="宇宙裡的 3D 星球"></model-viewer><span id="card-model-status" role="status"></span></div>
+          <p id="card-analysis"></p>
           <span class="card-type" id="card-type"></span>
           <h3 id="card-name"></h3>
           <p id="card-id"></p>
           <div id="card-scores"></div>
+          <button class="card-details-btn" id="open-planet-result">查看完整人格分析 →</button>
         </aside>
       </section>
 
@@ -164,6 +169,6 @@
     </main>
 
     <div class="toast" id="toast" role="status"></div>
-    <script src="app.js?v=20260923-model3"></script>
+    <script src="app.js?v=20260923-universe4"></script>
   </body>
 </html>
