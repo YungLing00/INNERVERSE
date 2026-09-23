@@ -56,7 +56,14 @@
           <p class="profile-lead">資料將用來建立專屬星球。建議使用暱稱；生日只用於產生星球象徵與 Seed。</p>
           <form id="profile-form">
             <label><span>YOUR NAME／暱稱</span><input id="nickname" maxlength="24" autocomplete="nickname" placeholder="例如：Ling" required /></label>
-            <label><span>BIRTHDAY／生日</span><input id="birthday" type="date" min="1900-01-01" required /></label>
+            <fieldset class="birthday-field">
+              <legend>BIRTHDAY／生日</legend>
+              <div class="birthday-selects">
+                <select id="birth-year" aria-label="出生年份" required><option value="">年</option></select>
+                <select id="birth-month" aria-label="出生月份" required><option value="">月</option></select>
+                <select id="birth-day" aria-label="出生日期" required><option value="">日</option></select>
+              </div>
+            </fieldset>
             <label class="consent"><input id="consent" type="checkbox" required /><span>我同意將暱稱、人格結果與星球資料儲存在共享宇宙中。</span></label>
             <button class="primary-btn" type="submit">START THE TEST <span>→</span></button>
           </form>
