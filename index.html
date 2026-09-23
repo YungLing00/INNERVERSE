@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#050713" />
     <meta name="description" content="INNERVERSE — 透過 10 道題，讓你的性格成為宇宙中的一顆星球。" />
     <title>INNERVERSE — Discover Your Inner Planet</title>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -47,6 +48,21 @@
         <div class="scroll-note">SCROLL TO DISCOVER <span></span></div>
       </section>
 
+      <section id="profile" class="screen profile-screen" aria-labelledby="profile-title">
+        <div class="profile-shell">
+          <button class="back-btn" data-go="home">← BACK</button>
+          <p class="eyebrow">BEFORE WE BEGIN</p>
+          <h2 id="profile-title">Tell us about<br /><span>your inner world.</span></h2>
+          <p class="profile-lead">資料將用來建立專屬星球。建議使用暱稱；生日只用於產生星球象徵與 Seed。</p>
+          <form id="profile-form">
+            <label><span>YOUR NAME／暱稱</span><input id="nickname" maxlength="24" autocomplete="nickname" placeholder="例如：Ling" required /></label>
+            <label><span>BIRTHDAY／生日</span><input id="birthday" type="date" min="1900-01-01" required /></label>
+            <label class="consent"><input id="consent" type="checkbox" required /><span>我同意將暱稱、人格結果與星球資料儲存在共享宇宙中。</span></label>
+            <button class="primary-btn" type="submit">START THE TEST <span>→</span></button>
+          </form>
+        </div>
+      </section>
+
       <section id="test" class="screen test-screen" aria-labelledby="question-title">
         <div class="test-shell">
           <button class="back-btn" id="test-back">← BACK</button>
@@ -70,9 +86,11 @@
           <div class="forming-ring ring-a"></div><div class="forming-ring ring-b"></div>
           <div class="planet forming-planet"><span></span></div>
         </div>
-        <p class="eyebrow">ANALYZING YOUR INNER WORLD</p>
+        <p class="eyebrow" id="forming-stage">ANALYZING YOUR INNER WORLD</p>
         <h2>Your planet is forming<span class="dots">...</span></h2>
-        <p>正在將你的性格特質轉化為星球。</p>
+        <p id="forming-message">正在將你的性格特質轉化為星球。</p>
+        <div class="generation-progress"><i id="generation-bar"></i></div>
+        <strong class="generation-number" id="generation-number">0%</strong>
       </section>
 
       <section id="result" class="screen result-screen" aria-labelledby="result-name">
@@ -80,6 +98,7 @@
           <div class="result-visual">
             <div class="result-orbit"></div>
             <div class="planet result-planet" id="result-planet"><span></span></div>
+            <model-viewer id="result-model" camera-controls auto-rotate shadow-intensity="1" environment-image="neutral" interaction-prompt="none" alt="AI 生成的專屬 3D 星球"></model-viewer>
             <span class="coordinate" id="planet-id">PLANET #000000</span>
           </div>
           <div class="result-copy">
@@ -88,6 +107,7 @@
             <h2 id="result-name">EXPLORER</h2>
             <p class="result-subtitle" id="result-subtitle">The Blue Planet</p>
             <p class="result-description" id="result-description"></p>
+            <div class="birth-keywords" id="birth-keywords"></div>
             <div class="score-list" id="score-list"></div>
             <div class="result-actions">
               <button class="primary-btn" id="enter-universe">ENTER THE UNIVERSE <span>→</span></button>
