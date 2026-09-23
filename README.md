@@ -62,3 +62,15 @@ const API_URL = "https://script.google.com/macros/s/你的部署ID/exec";
 5. 重新部署「網頁應用程式」的新版本，存取權設為「所有人」。
 
 請勿把 Tripo API Key 放進 `app.js`、GitHub 或試算表。Tripo 的生成模型網址有效時間很短；正式長期保存需在下一階段串接 Supabase Storage、Cloudflare R2 或其他物件儲存服務。
+
+## OpenAI GPT API
+
+GPT 會先讀取生日的太陽星座象徵與 Big Five 分數，輸出星球名稱、三個關鍵字、人格描述，以及交給 Tripo 的英文 3D Prompt。
+
+1. 在 OpenAI Platform 建立 API Key。
+2. 開啟 Apps Script 的「專案設定 → 指令碼屬性」。
+3. 新增 `OPENAI_API_KEY`，值填入 OpenAI API Key。
+4. 可選擇新增 `OPENAI_MODEL`；未設定時使用 `gpt-5-mini`。
+5. 貼上最新版 `backend/Code.gs`，再重新部署網頁應用程式的新版本。
+
+OpenAI API Key 只保存在 Apps Script，不能放進 GitHub 或前端。生日只能可靠判斷太陽星座；完整星盤還需要出生時間、出生地點與天文星曆計算服務，不能直接由 GPT 猜測。
