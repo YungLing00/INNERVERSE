@@ -74,3 +74,5 @@ GPT 會先讀取生日的太陽星座象徵與 Big Five 分數，輸出星球名
 5. 貼上最新版 `backend/Code.gs`，再重新部署網頁應用程式的新版本。
 
 OpenAI API Key 只保存在 Apps Script，不能放進 GitHub 或前端。生日只能可靠判斷太陽星座；完整星盤還需要出生時間、出生地點與天文星曆計算服務，不能直接由 GPT 猜測。
+
+完成測驗後，Apps Script 會自動建立 `planet_generation_log` 工作表。內容包含年／月／日、10 題原始答案、反向題轉換值、OCEAN 原始總分與百分比分數、人格排序、GPT 輸出、Tripo Prompt、API 狀態、錯誤訊息、模型網址及完整 JSON 紀錄。
